@@ -5,6 +5,7 @@ Before requesting review when using AI Assistance, I confirm:
 - [ ] I filled out `.brainsback/<task-folder>/TODO.md` with a clear plan **before** coding
 - [ ] I completed `.brainsback/<task-folder>/REACTO.md` explaining my understanding using REACTO-SE
 - [ ] AI generated `.brainsback/<task-folder>/REPORT.md` summarizes the changes accurately
+- [ ] For the pipeline-controlled task, `.brainsback/<task-folder>/SOCRATIC_REVIEW.md` shows a completed review with a mastery verdict (this happens right after `REACTO.md`, as part of that task — not as a separate end-of-experiment step)
 - [ ] I manually tested the changes
 - [ ] I added/updated tests where appropriate
 - [ ] I understand the trade-offs and can defend my design choices

@@ -37,9 +37,10 @@ Each iteration lives in `.brainsback/#######_task_description_YYYY.MM.dd_hhmmss/
   - You may **read** `REACTO.md` to understand intent and context.
   - Do **not** auto-fill or heavily rewrite answers for the user; ask questions instead.
 
-- `.brainsback/SOCRATIC_REVIEW.md` — **Socratic Review Record (AI-generated)**
+- `.brainsback/<task-folder>/SOCRATIC_REVIEW.md` — **Socratic Review Record (AI-generated)**
   - **AI-owned**: humans must not create, edit, or pre-fill this file.
-  - Triggered only **after** the tasks in `README.md` are completed, as per the rules defined in the Socratic Reviewer skill.
+  - Applies **only** to the pipeline-controlled task. Triggered **immediately after** that task's `REACTO.md` is filled — as per the rules defined in the Socratic Reviewer skill. It is not deferred until both tasks are done, and it is not a final step before the Pull Request.
+  - Not applicable to free-implementation tasks: there is no Socratic review for them, at any point.
   - Serialized by the agent once it is satisfied the developer demonstrated genuine understanding; includes a mastery verdict.
   - Do **not** generate or fill this file outside a dedicated Socratic review session.
 
@@ -49,27 +50,21 @@ Each iteration lives in `.brainsback/#######_task_description_YYYY.MM.dd_hhmmss/
 
 Whenever the user asks what they should do next — or any similar question about the current state of the experiment — follow this procedure:
 
-1. **Read `README.md`** to understand the experiment's task structure (Task 1, Task 2, Socratic review). Check which tasks are controlled by the pipeline and which are free.
+1. **Read `README.md`** to understand the experiment's task structure (Task 1, Task 2). Determine which one is marked **Controlada pelo Pipeline** — the Socratic review belongs to that task only.
 2. **Check the current project state** by inspecting the codebase and artifacts.
-3. **Determine the next pending step** and respond with one of the following templates:
+3. **Walk the tasks in numeric order (Task 1, then Task 2).** For the first task that is not fully resolved, respond with the matching template below. A pipeline-controlled task is only "resolved" once its code, `REACTO.md`, **and** Socratic review are all done — do not move on to the next task, and do not mention the Socratic review in connection with the other task, before that happens.
 
-   ### Task 1 pending
-   > **Task 1 pending:** Check `README.md` for details on Task 1 requirements.
+   ### Task N pending
+   > **Task N pending:** Check `README.md` for details on Task N requirements.
    > Determine from `README.md` whether this task is pipeline-controlled or free.
    > - If pipeline-controlled: guide the user to fill `.brainsback/<task-folder>/TODO.md` first.
    > - If free: proceed with implementation as requested.
 
-   ### Task 2 pending
-   > **Task 2 pending:** Check `README.md` for details on Task 2 requirements.
-   > Determine from `README.md` whether this task is pipeline-controlled or free.
-   > - If pipeline-controlled: guide the user to fill `.brainsback/<task-folder>/TODO.md` first.
-   > - If free: the agent can implement directly without pipeline artifact requirements.
+   ### REACTO.md pending (pipeline-controlled task only)
+   > **REACTO.md pending:** Task N's code is implemented, but `.brainsback/<task-folder>/REACTO.md` is missing or empty. Please fill it in with your REACTO-SE explanation of the implementation before requesting a Socratic review.
 
-   ### REACTO.md pending
-   > **REACTO.md pending:** The pipeline-controlled task's `.brainsback/<task-folder>/REACTO.md` is missing or empty. Please fill it in with your REACTO-SE explanation of the implementation before requesting a Socratic review.
-
-   ### Socratic review pending
-   > **Socratic review pending:** All tasks are implemented and each pipeline-controlled task has its `.brainsback/<task-folder>/REACTO.md` filled. The file `.brainsback/SOCRATIC_REVIEW.md` is missing or does not contain a final conclusion. You can request a Socratic review by saying: "I want to start the Socratic review."
+   ### Socratic review pending (pipeline-controlled task only)
+   > **Socratic review pending:** Task N's `.brainsback/<task-folder>/REACTO.md` is filled, but `.brainsback/<task-folder>/SOCRATIC_REVIEW.md` is missing or does not contain a final verdict. This review is part of Task N itself — request it now by saying: "I want to start the Socratic review." Do not wait until the other task is finished.
 
    ### All tasks complete
-   > **All tasks complete!** You can commit your changes and open a Pull Request to the original repository.
+   > **All tasks complete!** Both tasks are implemented, and the pipeline-controlled task's `REACTO.md` and Socratic review are done. You can commit your changes and open a Pull Request to the original repository.

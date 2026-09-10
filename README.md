@@ -73,8 +73,9 @@ Importante: na Tarefa 2, o pipeline Mastery-Aware **É aplicado**.
 1. Preencha manualmente `.brainsback/0000002_chat_sessions_2026.01.01_000000/TODO.md` antes de pedir implementacao.
 2. O agente Copilot gera automaticamente `.brainsback/0000002_chat_sessions_2026.01.01_000000/REPORT.md` ao concluir a implementacao.
 3. Baseado no diff do repositorio e no REPORT criado automaticamente pelo agente, o participante preenche manualmente `.brainsback/0000002_chat_sessions_2026.01.01_000000/REACTO.md` com Repeat, Examples, Approach, Code, Test, Optimize.
+4. Com o REACTO.md preenchido, solicite ao agente: `Quero iniciar a revisao socratica.` O agente revisor conduzira um debate tecnico sobre esta tarefa e, ao final, gerara `.brainsback/0000002_chat_sessions_2026.01.01_000000/SOCRATIC_REVIEW.md` com o veredito de maestria. Esta revisao pertence exclusivamente a esta tarefa controlada pelo pipeline — nao havera uma nova revisao socratica ao final do experimento.
 
-Antes de dar a tarefa como finalizada e realizar commit, pergunte ao agent:
+Esta tarefa so e considerada concluida apos o REACTO.md preenchido e a revisao socratica finalizada com veredito de maestria. Antes de dar a tarefa como finalizada e realizar commit, pergunte ao agent:
 `Minha tarefa esta pronta para commit e de acordo com as regras do pipeline mastery-aware?`
 
 Implementar sessoes de chat e titulo automatico em uma barra lateral.
@@ -85,12 +86,10 @@ Requisitos minimos:
 3. Se a sessao ainda nao tiver titulo, o titulo deve ser definido automaticamente com base no contexto **possivel ja na primeira resposta do modelo**.
 ## Revisao Final e Pull Request
 
-Ao concluir as duas tarefas:
-1. Solicite: `Quero iniciar a revisao socratica.`
-2. Responda as perguntas do agente revisor.
-3. Aguarde confirmacao final antes do commit de entrega.
-4. Envie o Pull Request para o repositorio original.
-5. Preencha o formulário sobre Bem-Estar e Uso de Agentes Inteligentes no Desenvolvimento (pode ser feito em até 1 dia após o Pull Request): https://forms.gle/hXCBKcg2BstESGCQA
+A revisao socratica ja foi realizada como parte da Tarefa 2 (controlada pelo pipeline) — nao ha uma nova revisao socratica ao final do experimento. Ao concluir as duas tarefas:
+1. Revise o diff final e garanta que os testes passam.
+2. Envie o Pull Request para o repositorio original.
+3. Preencha o formulário sobre Bem-Estar e Uso de Agentes Inteligentes no Desenvolvimento (pode ser feito em até 1 dia após o Pull Request): https://forms.gle/hXCBKcg2BstESGCQA
 
 ## Escopo de Evolucao
 
