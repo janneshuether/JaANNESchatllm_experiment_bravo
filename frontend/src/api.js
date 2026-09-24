@@ -1,10 +1,15 @@
 const API_BASE = window.location.origin;
 
-async function sendMessageStream({ message, history, onDelta, signal }) {
+async function sendMessageStream({ message, history, sessionId, onDelta, onTitle, signal, token }) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${API_BASE}/api/chat/stream`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, history }),
+    headers,
+    body: JSON.stringify({ message, history, session_id: sessionId }),
     signal,
   });
 
@@ -50,8 +55,12 @@ async function sendMessageStream({ message, history, onDelta, signal }) {
         throw new Error(payload.error);
       }
 
-      if (payload.delta) {
+      if (payload.delta && onDelta) {
         onDelta(payload.delta);
+      }
+
+      if (payload.session_title && onTitle) {
+        onTitle(payload.session_title);
       }
     }
   }
@@ -105,3 +114,46 @@ const authApi = {
   },
 };
 
+const sessionApi = {
+  async getSessions(token) {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/api/sessions`, { headers });
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  async createSession(title, token) {
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const body = title ? JSON.stringify({ title }) : null;
+    const res = await fetch(`${API_BASE}/api/sessions`, {
+      method: "POST",
+      headers,
+      body,
+    });
+    if (!res.ok) throw new Error("Erro ao criar nova sessao.");
+    return await res.json();
+  },
+
+  async getSessionMessages(sessionId, token) {
+    if (!sessionId) return [];
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/api/sessions/${sessionId}/messages`, { headers });
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  async deleteSession(sessionId, token) {
+    if (!sessionId) return;
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/api/sessions/${sessionId}`, {
+      method: "DELETE",
+      headers,
+    });
+    if (!res.ok) throw new Error("Erro ao excluir sessao.");
+    return await res.json();
+  },
+};

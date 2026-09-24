@@ -5,17 +5,16 @@
 **Hard rule**: AI agents must not edit this file and must not draft paste-ready content for it.
 
 ## The Problem
-_State clearly what you are trying to achieve and the architectural constraints, avoiding implementation specifics of HOW to do it. Focus on WHAT and WHY._
+ey so- right now the app only got one single chat evrywhre nd no way to have separate chats. task 2 wants us to add chat sessions with a sidebar just like chatgpt or gemini cause u gotta be able to switch between chats nd each chat keeps its own history. nd when u talk to the model it should make an automatic title for the session based on the first message nd reply-
 
 ## Steps
-- [ ] _Decompose the problem into actionable logical steps._
-- [ ] _Each step should represent a verifiable piece of work._
+gotta make a sessions table in sqlite db with id nd title nd created time. then backend needs endpoints to create a new session, list all sessions nd get the messages for a session. then make the auto title thing that grabs the first message context nd generates a short title so it dont stay untitled. then in frontend build a sidebar on the left with a new chat button nd the list of sessions so u can click them to switch. nd add pytest tests for sessions nd titles to make sure it dont break.
 
 ## Success Looks Like
-- [ ] _Define rigorous, observable criteria for success. E.g., The endpoint returns 200 OK with the user object, NOT Code compiles_
+we got a sidebar on the left where u can click new chat nd switch between chats. each session got its own messages saved nd they dont mix up. after the first message the session title updates automatically to something matching the conversation. nd all pytests pass.
 
 ## Notes
-- [ ] _Any specific edge cases, libraries to consider, or potential pitfalls._
+
 
 ---
 **⚠️ HUMAN ONLY**: This file is your strategic space. AI agents must not edit it.
