@@ -56,3 +56,52 @@ async function sendMessageStream({ message, history, onDelta, signal }) {
     }
   }
 }
+
+const authApi = {
+  async register({ email, password }) {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.detail || "Erro ao registrar usuario.");
+    }
+    return data;
+  },
+
+  async login({ email, password }) {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.detail || "Erro ao realizar login.");
+    }
+    return data;
+  },
+
+  async logout(token) {
+    if (!token) return;
+    await fetch(`${API_BASE}/api/auth/logout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }).catch(() => {});
+  },
+
+  async getMe(token) {
+    if (!token) return null;
+    const res = await fetch(`${API_BASE}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  },
+};
+

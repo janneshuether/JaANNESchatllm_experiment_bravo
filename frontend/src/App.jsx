@@ -18,6 +18,31 @@ function App() {
   const messagesRef = useRef(null);
   const abortControllerRef = useRef(null);
 
+  // Auth state
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+
+  // Restore user session on mount
+  useEffect(() => {
+    const token = localStorage.getItem("chatllm_token");
+    if (token) {
+      authApi.getMe(token).then((user) => {
+        if (user) {
+          setCurrentUser(user);
+        } else {
+          localStorage.removeItem("chatllm_token");
+        }
+      }).catch(() => {
+        localStorage.removeItem("chatllm_token");
+      });
+    }
+  }, []);
+
   const chatHistory = useMemo(
     () => messages.filter((msg) => msg.role === "user" || msg.role === "assistant"),
     [messages]
@@ -38,6 +63,42 @@ function App() {
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
     setBusy(false);
+  };
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("chatllm_token");
+    localStorage.removeItem("chatllm_token");
+    setCurrentUser(null);
+    if (token) {
+      await authApi.logout(token).catch(() => {});
+    }
+  };
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError("");
+    setAuthLoading(true);
+
+    try {
+      let result;
+      if (authMode === "register") {
+        result = await authApi.register({ email: authEmail, password: authPassword });
+      } else {
+        result = await authApi.login({ email: authEmail, password: authPassword });
+      }
+
+      if (result && result.token && result.user) {
+        localStorage.setItem("chatllm_token", result.token);
+        setCurrentUser(result.user);
+        setIsAuthModalOpen(false);
+        setAuthEmail("");
+        setAuthPassword("");
+      }
+    } catch (err) {
+      setAuthError(err.message || "Erro na autenticacao.");
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   const onSubmit = async (event, inputRef) => {
@@ -112,6 +173,44 @@ function App() {
     <main className="app-shell">
       <header className="app-header">
         <div className="brand">ChatLLM Lab</div>
+        <div className="auth-controls">
+          {currentUser ? (
+            <>
+              <div className="user-badge" title={currentUser.email}>
+                <span>👤</span>
+                <span>{currentUser.email}</span>
+              </div>
+              <button type="button" className="btn-logout" onClick={handleLogout}>
+                Sair
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn-auth"
+                onClick={() => {
+                  setAuthMode("login");
+                  setAuthError("");
+                  setIsAuthModalOpen(true);
+                }}
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                className="btn-auth btn-auth-primary"
+                onClick={() => {
+                  setAuthMode("register");
+                  setAuthError("");
+                  setIsAuthModalOpen(true);
+                }}
+              >
+                Cadastrar
+              </button>
+            </>
+          )}
+        </div>
       </header>
 
       <section className="messages" aria-live="polite" ref={messagesRef}>
@@ -134,10 +233,86 @@ function App() {
       />
 
       <div className="warning-banner">Lembre-se, você precisa focar no experimento!!!</div>
+
+      {isAuthModalOpen && (
+        <div className="modal-backdrop" onClick={() => setIsAuthModalOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="modal-close"
+              onClick={() => setIsAuthModalOpen(false)}
+              aria-label="Fechar"
+            >
+              &times;
+            </button>
+            <div className="modal-tabs">
+              <button
+                type="button"
+                className={`modal-tab ${authMode === "login" ? "active" : ""}`}
+                onClick={() => {
+                  setAuthMode("login");
+                  setAuthError("");
+                }}
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                className={`modal-tab ${authMode === "register" ? "active" : ""}`}
+                onClick={() => {
+                  setAuthMode("register");
+                  setAuthError("");
+                }}
+              >
+                Cadastrar
+              </button>
+            </div>
+
+            {authError && <div className="auth-error">{authError}</div>}
+
+            <form onSubmit={handleAuthSubmit}>
+              <div className="form-group">
+                <label htmlFor="auth-email">E-mail</label>
+                <input
+                  id="auth-email"
+                  type="email"
+                  className="form-input"
+                  required
+                  placeholder="seu@email.com"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="auth-password">Senha</label>
+                <input
+                  id="auth-password"
+                  type="password"
+                  className="form-input"
+                  required
+                  placeholder="Sua senha"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                />
+              </div>
+              <button
+                type="submit"
+                className="form-submit"
+                disabled={authLoading}
+              >
+                {authLoading
+                  ? "Aguarde..."
+                  : authMode === "login"
+                  ? "Entrar"
+                  : "Criar Conta"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
-
